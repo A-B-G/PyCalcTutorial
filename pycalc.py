@@ -16,9 +16,16 @@ from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtWidgets import QVBoxLayout
 """ import partial() to connect signals with methods that accept extra args"""
 from functools import partial
+import pycalcModel
+"""
+import pycalcModel
+# pycalcModel.greet()
+"""
 
 __version__ = '0.1'
 __author__ = 'ABG'
+
+ERROR_MSG = pycalcModel.ERROR_MSG
 
 class PyCalcUi(QMainWindow):
     # PyCalc's VIEW (GUI)
@@ -114,13 +121,27 @@ class PyCalcCtrl:
     # initalize the PyCalc Controller class
     # 1. give PyCalcCtrl an instance of PyCalcUi
     # to gain full acccess to the View's public interface
-    def __init__(self, view):
+    def __init__(self, model, view):
+        self._evaluate = model
+
         self._view = view
     # connect signals and slots
         self._connectSignals()
-    
+
+    # 5. take the display content, evaluate the math expression, and show the result
+    # with calculateResult()
+    def _calculateResult(self):
+        # get display content and evaluate the expression
+        result = self._evaluate(expression=self._view.displayText())
+        # show the result in the display
+        self._view.setDisplayText(result)
+
     # 2. Handle creation of math expressions and update display per user input
     def _buildExpression(self, sub_exp):
+         # 6. add an if statement to clear the display if an error occurs
+        if self._view.displayText() == ERROR_MSG:
+            # clear the display and start over if there is an error
+            self._view.clearDisplay()
         # build expression
         expression = self._view.displayText() + sub_exp
         self._view.setDisplayText(expression)
@@ -132,6 +153,10 @@ class PyCalcCtrl:
         for btnText, btn in self._view.buttons.items():
             if btnText not in {'=', 'C'}:
                 btn.clicked.connect(partial(self._buildExpression, btnText))
+         # 7.add a connection to enable the = sign
+        self._view.buttons['='].clicked.connect(self._calculateResult)
+        # 7. add a connect to ensure the expression is calculated when user hits "ENTER"
+        self._view.display.returnPressed.connect(self._calculateResult)
         # connect the clear (C) button to _view.clearDisplay() to clear display text
         self._view.buttons['C'].clicked.connect(self._view.clearDisplay)
 
@@ -145,9 +170,12 @@ def main():
     # 3. show the GUI with view.show()
     view.show()
 
-    # *** create instances of Model and Controller ***
-    # create an instance of PyCalcCtrl() and pass View in as an argument
-    PyCalcCtrl(view=view)
+    # *** create instances of Model and Controller ***    
+    
+    # model holds a reference to evaluateExpression() 
+    model = pycalcModel.evaluateExpression
+    # create an instance of PyCalcCtrl() and pass View and Model in as arguments
+    PyCalcCtrl(model=model, view=view)
 
     # 4. Execute the calculator's main/event looop with .exec_()
     # wrap this in sys.exit
