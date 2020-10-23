@@ -72,7 +72,7 @@ These methods will form the GUI public interface.
 
 
 ## The Basic Controller
-Connect the View to the Model with the Controller class. The GUI interface is done, but the calculator won't work until the model and controller are implemented. The Controller class will make the calculator perform actions in response to user events.<br>
+Connect the View to the Model with the Controller class. The GUI interface is done, but the calculator won't work until the Model and Controller are implemented. The Controller class will make the calculator perform actions in response to user events.<br>
 The Controller class performs three main tasks:
 1. Access the GUI's public interface
 2. Handle the creation of math expressions
@@ -91,6 +91,34 @@ Make sure to  import `functools.partial`:<br>
 For the Controller to work, "main()" must be updated:
 Between `view.show()` and `sys.exit(pycalc.exec_())`, create an instance of PyCalcCtrl() and pass in view as an argument:
 ```PyCalcCtrl(view=view)```
+
+
+## The Model
+The Model is the layer of code that handles the business logic, math calculations in this case. The Model here is a single function "evaluateExpression," with a `try..except` block.
+- A best practice wold have the `try...except` block catch specific exceptions (not coded here). 
+- Use `eval()` to evaluate a string as an expression. 
+- Define a global contstant to handle errors. Note: `eval()` should only be used with trusted inputs.
+
+
+## Completing the Controller 
+After completing the calculator's Model, add logic to PyCalcCtrl to process the calculations and ensure the equal sign is functional.
+4. Add the model to the PyCalcCtrl init function so that the class receives instances from both the Model and the View
+
+5. Add a _calculateResult() method to evaluate expressions and display the result
+
+6. Add an if statement to _buildExpressions() that checks if an error occured with the global ERROR_MSG 
+
+7. Add two more connections inside _connectSignals() to connect the equal sign and "Enter" button
+
+8. update main():
+- declare a model variable, which holds a reference to evaluateExpression(), and pass it as a parameter
+
+## Troubleshooting
+Troubleshooting checklist: 
+- is everything spelled correctly?
+- is everything indented correctly?
+- is everything imported?
+- is the main function defined correctly?
 
 
 
